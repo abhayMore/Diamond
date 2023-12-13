@@ -361,5 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/sfml-window-d-2.dll
-/sfml-window-2.dll
+/Diamond/sfml-window-d-2.dll
+/Diamond/sfml-window-2.dll
