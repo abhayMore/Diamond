@@ -26,7 +26,7 @@ sf::Vector2f calculateDirection(float rotationAngle)
 }
 
 
-class RegularPolygon : public sf::ConvexShape 
+class RegularPolygon : public sf::ConvexShape
 {
 private:
     unsigned int sideCount;
@@ -60,7 +60,7 @@ public:
         setOutlineThickness(1);
         setFillColor(sf::Color::Transparent);
         updateShape();
-    }  
+    }
 
     sf::Vector2f getCentroid()
     {
@@ -173,7 +173,6 @@ bool isSAT_STATIC(RegularPolygon& r1, RegularPolygon& r2)
     //r1.setPosition(r1.getPosition().x - (overlap * d.x / s), r1.getPosition().y - (overlap * d.y / s));
     r1.setPosition(pos);
 
-    std::cout << r1.getPosition().x << ' ' << r1.getPosition().y << std::endl;
     return false;
 }
 
@@ -376,7 +375,7 @@ int main() {
             {
                 switch (event.key.code)
                 {
-                case sf::Keyboard::W:                
+                case sf::Keyboard::W:
                 case sf::Keyboard::S:
                 {
                     movementPentagon = MovementPolygon::NONE;
@@ -388,14 +387,14 @@ int main() {
                     directionPentagon = DirectionPolygon::NONE;
                     break;
                 }
-                case sf::Keyboard::Up:                
-                case sf::Keyboard::Down: 
+                case sf::Keyboard::Up:
+                case sf::Keyboard::Down:
                 {
                     movementTriangle = MovementPolygon::NONE;
 
                     break;
                 }
-                case sf::Keyboard::Left:               
+                case sf::Keyboard::Left:
                 case sf::Keyboard::Right:
                 {
                     directionTriangle = DirectionPolygon::NONE;
@@ -405,7 +404,7 @@ int main() {
                     break;
                 }
                 break;
-            }         
+            }
             default:
                 break;
             }
@@ -447,25 +446,25 @@ int main() {
         triangleDirectionLine.setRotation(rotationAngle);
         myConvexShapes[0].setRotation(rotationAngle);
 
-       
+
         for (int m = 0; m < myConvexShapes.size(); m++)
         {
             for (int n = m + 1; n < myConvexShapes.size(); n++)
             {
                 //myConvexShapes[m].overlap |= isSAT(myConvexShapes[m], myConvexShapes[n]);
-                //myConvexShapes[m].overlap |= isSAT_STATIC(myConvexShapes[m], myConvexShapes[n]);
+                myConvexShapes[m].overlap |= isSAT_STATIC(myConvexShapes[m], myConvexShapes[n]);
                 //myConvexShapes[m].overlap |= isDIAG(myConvexShapes[m], myConvexShapes[n]);
-                myConvexShapes[m].overlap |= isDIAG_STATIC(myConvexShapes[m], myConvexShapes[n]);
+                //myConvexShapes[m].overlap |= isDIAG_STATIC(myConvexShapes[m], myConvexShapes[n]);
             }
         }
 
         window.clear();
-        
+
         for (auto& i : myConvexShapes)
         {
             if (i.overlap)
                 i.setOutlineColor(sf::Color::Red);
-            else 
+            else
                 i.setOutlineColor(sf::Color::White);
 
             window.draw(i);
