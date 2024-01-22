@@ -4,10 +4,6 @@
 
 #define PI 3.14159265 
 
-sf::Vector2f perpendicular_vector(const sf::Vector2f& v) {
-    return sf::Vector2f(-v.y, v.x);
-}
-
 enum class MovementPolygon {
     NONE = 0,
     FORWARD,
@@ -19,12 +15,24 @@ enum class DirectionPolygon {
     RIGHT
 };
 
+sf::Vector2f perpendicular_vector(const sf::Vector2f& v) {
+    return sf::Vector2f(-v.y, v.x);
+}
+
+sf::Vector2f normalize(const sf::Vector2f& vector)
+{
+    float length = std::sqrtf(vector.x * vector.x + vector.y * vector.y);
+    if (length != 0.0f)
+        return sf::Vector2f(vector.x / length, vector.y / length);
+    else
+        return vector;
+}
+
 sf::Vector2f calculateDirection(float rotationAngle)
 {
     float radians = static_cast<float>(rotationAngle * (PI / 180.0f));
     return -perpendicular_vector(sf::Vector2f(cos(radians), sin(radians)));
 }
-
 
 class RegularPolygon : public sf::ConvexShape
 {
@@ -66,6 +74,11 @@ public:
     {
         return centroid;
     }
+
+    int getSideCount()
+    {
+        return sideCount;
+    }
 };
 
 bool isSAT(RegularPolygon& r1, RegularPolygon& r2)
@@ -83,7 +96,7 @@ bool isSAT(RegularPolygon& r1, RegularPolygon& r2)
         for (int a = 0; a < poly1->getPointCount(); a++)
         {
             int b = (a + 1) % poly1->getPointCount();
-            sf::Vector2f axisProj = perpendicular_vector(poly1->getPoint(b) - poly1->getPoint(a));
+            sf::Vector2f axisProj = normalize(perpendicular_vector(poly1->getPoint(b) - poly1->getPoint(a)));
             //{ -(poly1->at(b).y - poly1->at(a).y), (poly1->at(b).x - poly1->at(a).x) };
 
             //work out min and max for r1
@@ -131,9 +144,8 @@ bool isSAT_STATIC(RegularPolygon& r1, RegularPolygon& r2)
         for (int a = 0; a < poly1->getPointCount(); a++)
         {
             int b = (a + 1) % poly1->getPointCount();
-            sf::Vector2f axisProj = perpendicular_vector(poly1->getPoint(b) - poly1->getPoint(a));
-            //{ -(poly1->at(b).y - poly1->at(a).y), (poly1->at(b).x - poly1->at(a).x) };
-
+            sf::Vector2f axisProj = normalize(perpendicular_vector(poly1->getPoint(b) - poly1->getPoint(a)));
+            //{ -(poly1->getPoint(b).y - poly1->getPoint(a).y), (poly1->getPoint(b).x - poly1->getPoint(a).x) };
 
             //work out min and max for r1
             float min_r1 = INFINITY;
@@ -163,7 +175,7 @@ bool isSAT_STATIC(RegularPolygon& r1, RegularPolygon& r2)
         }
     }
 
-    sf::Vector2f d = { r2.getPosition().x - r1.getPosition().x,r2.getPosition().y - r1.getPosition().y };
+    sf::Vector2f d = { r2.getPosition().x - r1.getPosition().x, r2.getPosition().y - r1.getPosition().y };
     float s = sqrtf(d.x * d.x + d.y * d.y);
 
     auto pos = r1.getPosition();
@@ -265,7 +277,6 @@ bool isDIAG_STATIC(RegularPolygon& r1, RegularPolygon& r2)
     }
     return false;
 }
-
 
 int main() {
     sf::ContextSettings settings;
@@ -446,7 +457,6 @@ int main() {
         triangleDirectionLine.setRotation(rotationAngle);
         myConvexShapes[0].setRotation(rotationAngle);
 
-
         for (int m = 0; m < myConvexShapes.size(); m++)
         {
             for (int n = m + 1; n < myConvexShapes.size(); n++)
@@ -463,9 +473,17 @@ int main() {
         for (auto& i : myConvexShapes)
         {
             if (i.overlap)
+            {
                 i.setOutlineColor(sf::Color::Red);
+                if(i.getPointCount() == 3) triangleDirectionLine.setFillColor(sf::Color::Red);
+                if(i.getPointCount() == 5) polygonDirectionLine.setFillColor(sf::Color::Red);
+            }
             else
+            {
                 i.setOutlineColor(sf::Color::White);
+                if(i.getPointCount() == 3) triangleDirectionLine.setFillColor(sf::Color::White);
+                if(i.getPointCount() == 5) polygonDirectionLine.setFillColor(sf::Color::White);
+            }
 
             window.draw(i);
             i.overlap = false;
